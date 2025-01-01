@@ -239,12 +239,12 @@ class GraphQLService extends Service {
 
   /// Query documents
   Future<dynamic> _queryDocuments(String query,
-      [Map<String, dynamic>? variables]) async {
+      [Map<String, dynamic> variables = const {}]) async {
     for (var i = 1; i <= _maxRetry; i++) {
       var client = (await graphClient)!;
       var options = QueryOptions(
         document: gql(query),
-        variables: variables!,
+        variables: variables,
         errorPolicy: ErrorPolicy.all,
         fetchPolicy: FetchPolicy.noCache,
       );
@@ -262,9 +262,9 @@ class GraphQLService extends Service {
 
   /// Get graph client base on token from cognito
   Future<GraphQLClient?> get graphClient async {
-    if (_graphClient == null || !(await user!.hasSignedIn())) {
-      await user!.resourceTokens();
-      final authLink = AuthLink(getToken: () => user!.refreshToken);
+    if (_graphClient == null || (user != null && !(await user!.hasSignedIn()))) {
+      await user?.resourceTokens();
+      final authLink = AuthLink(getToken: () => user?.refreshToken);
       final link = authLink.concat(_httpLink);
       _graphClient = GraphQLClient(
         cache: GraphQLCache(),
