@@ -64,7 +64,7 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
     _cognitoUser!.getSignInUserSession()?.invalidateToken();
     final clockDriftKey = '${_cognitoUser!.keyPrefix}.clockDrift';
     final clockDrift =
-        int.tryParse(await _cognitoUser!.storage.getItem(clockDriftKey)) ?? 0;
+        int.tryParse(await _cognitoUser!.storage.getItem(clockDriftKey) ?? '0') ?? 0;
     await _cognitoUser!.storage
         .setItem(clockDriftKey, '${clockDrift - Duration.secondsPerHour * 2}');
   }
@@ -146,7 +146,7 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
         await servicePoint.database
             .deleteLocal(servicePoint.tableName, servicePoint.id);
       }
-      await Sync.shared.local!.clearTable(table);
+      await Sync.shared.local.clearTable(table);
     }
   }
 

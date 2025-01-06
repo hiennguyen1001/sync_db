@@ -41,7 +41,7 @@ extension $Category on Category {
   }
 
   static Future<Category> find(String? id) async =>
-      await Category().database!.find('Category', id, Category());
+      await Category().database.find('Category', id, Category());
 }
 
 // class Series extends Model {

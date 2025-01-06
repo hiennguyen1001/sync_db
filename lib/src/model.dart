@@ -26,7 +26,7 @@ abstract class Model extends ChangeNotifier {
     return map.toString();
   }
 
-  Database? get database => Sync.shared.local;
+  Database get database => Sync.shared.local;
   SyncPermission get syncPermission => SyncPermission.user;
 
   Map<String, dynamic> get map {
@@ -65,7 +65,7 @@ abstract class Model extends ChangeNotifier {
   String get tableName;
 
   Future<void> save({bool syncToService = true}) async =>
-      await database!.save(this, syncToService: syncToService);
+      await database.save(this, syncToService: syncToService);
 
   /// delete and sync record
   Future<void> delete() async {
@@ -75,19 +75,19 @@ abstract class Model extends ChangeNotifier {
 
   /// delete local record
   Future<void> deleteLocal() async {
-    await database!.deleteLocal(tableName, id);
+    await database.deleteLocal(tableName, id);
   }
 
   Future<void> deleteAll() async {
     var now = (await NetworkTime.shared.now).millisecondsSinceEpoch;
-    await database!.runInTransaction(tableName, (transaction) async {
+    await database.runInTransaction(tableName, (transaction) async {
       var list =
-          await database!.queryMap(Query(tableName), transaction: transaction);
+          await database.queryMap(Query(tableName), transaction: transaction);
       for (var item in list) {
         item[deletedKey] = now;
         item[updatedKey] = now;
         item[statusKey] = SyncStatus.updated.name;
-        await database!.saveMap(tableName, item, transaction: transaction);
+        await database.saveMap(tableName, item, transaction: transaction);
       }
     });
   }

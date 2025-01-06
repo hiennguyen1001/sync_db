@@ -108,7 +108,7 @@ class GraphQLService extends Service {
     var query = q.Query(table)
         .where('_status = ${SyncStatus.created.name}')
         .order('createdAt asc');
-    var records = await Sync.shared.local!.queryMap(query);
+    var records = await Sync.shared.local.queryMap(query);
 
     for (final record in records) {
       var fields = _getFields(table);
@@ -129,7 +129,7 @@ class GraphQLService extends Service {
     query = q.Query(table)
         .where('_status = ${SyncStatus.updated.name}')
         .order('updatedAt asc');
-    records = await Sync.shared.local!.queryMap(query);
+    records = await Sync.shared.local.queryMap(query);
     for (var record in records) {
       var fields = _getFields(table);
 

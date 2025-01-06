@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:queue/queue.dart';
-import 'package:sembast/sembast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:singleton/singleton.dart';
 import 'package:sync_db/sync_db.dart';
@@ -158,7 +157,7 @@ class SembastDatabase extends sync_db.Database {
     }
   }
 
-  Future<sembast.Database?> _getDatabse(String? tableName) async {
+  Future<sembast.Database?> _getDatabase(String? tableName) async {
     if (_database[tableName] == null) {
       await initTable(tableName);
     }
@@ -191,11 +190,11 @@ class SembastDatabase extends sync_db.Database {
       {bool listenable = false}) async {
     final store = sembast.StoreRef.main();
     var recordRef = await store.record(id);
-    final record = await recordRef.get((await _getDatabse(modelName))!);
+    final record = await recordRef.get((await _getDatabase(modelName))!);
     if (record != null && (record is Map) && record[deletedKey] == null) {
       await model.setMap(sembast_utils.cloneValue(record) as Map<String, dynamic>);
       if (listenable) {
-        model.stream = recordRef.onSnapshot((await _getDatabse(modelName))!);
+        model.stream = recordRef.onSnapshot((await _getDatabase(modelName))!);
       }
 
       return model;
@@ -211,7 +210,7 @@ class SembastDatabase extends sync_db.Database {
       {dynamic transaction}) async {
     final store = sembast.StoreRef.main();
     var result =
-        (await store.record(id).get(transaction ?? (await _getDatabse(modelName))!))!;
+        (await store.record(id).get(transaction ?? (await _getDatabase(modelName))!))!;
     return sembast_utils.cloneValue(result);
   }
 
@@ -231,7 +230,7 @@ class SembastDatabase extends sync_db.Database {
         if (listenable) {
           model.stream = store
               .record(model.id)
-              .onSnapshot((await _getDatabse(query.tableName))!);
+              .onSnapshot((await _getDatabase(query.tableName))!);
         }
 
         results.add(model);
@@ -345,7 +344,7 @@ class SembastDatabase extends sync_db.Database {
       finder.limit = query.resultLimit!;
     }
 
-    final db = await _getDatabse(query.tableName);
+    final db = await _getDatabase(query.tableName);
     var records = await store.find(transaction ?? db!, finder: finder);
     for (var record in records.where((element) => element.value != null,)) {
       var value = sembast_utils.cloneValue(record.value!);
@@ -357,7 +356,7 @@ class SembastDatabase extends sync_db.Database {
 
   @override
   Future<void> runInTransaction(String? tableName, Function action) async {
-    final db = (await _getDatabse(tableName))!;
+    final db = (await _getDatabase(tableName))!;
     await db.transaction((transaction) async {
       await action(transaction);
     });
@@ -396,7 +395,7 @@ class SembastDatabase extends sync_db.Database {
     final store = sembast.StoreRef.main();
 
     // Store and then start the sync
-    await store.record(model.id).put((await _getDatabse(name))!, map);
+    await store.record(model.id).put((await _getDatabase(name))!, map);
 
     // sync to server
     if (syncToService && model.syncPermission == SyncPermission.user) {
@@ -419,7 +418,7 @@ class SembastDatabase extends sync_db.Database {
     final store = sembast.StoreRef<String?, dynamic>.main();
     await store
         .record(map[idKey])
-        .put(transaction ?? (await _getDatabse(tableName))!, map);
+        .put(transaction ?? (await _getDatabase(tableName))!, map);
   }
 
   /// Import data from sembast file (in text string) -> this is not supported for web
@@ -442,14 +441,14 @@ class SembastDatabase extends sync_db.Database {
 
   @override
   Future<void> clearTable(String tableName) async {
-    var db = (await _getDatabse(tableName))!;
+    var db = (await _getDatabase(tableName))!;
     final store = sembast.StoreRef.main();
     await store.delete(db, finder: sembast.Finder());
   }
 
   @override
   Future<void> resetTable(String tableName) async {
-    var db = (await _getDatabse(tableName))!;
+    var db = (await _getDatabase(tableName))!;
     await db.close();
     if (UniversalPlatform.isWeb) {
       await databaseFactoryWeb.deleteDatabase(db.path);
@@ -459,7 +458,7 @@ class SembastDatabase extends sync_db.Database {
     _database.remove(tableName);
     Sync.shared.logger?.i('Cleared table $tableName');
     // reopen
-    await _getDatabse(tableName);
+    await _getDatabase(tableName);
   }
 
   @override
@@ -469,7 +468,7 @@ class SembastDatabase extends sync_db.Database {
     tablesToClear.addAll(_database.keys);
     tablesToClear.addAll(servicePoints.map((e) => e.name));
     for (var tableName in tablesToClear) {
-      var db = (await _getDatabse(tableName))!;
+      var db = (await _getDatabase(tableName))!;
       await db.close();
       if (UniversalPlatform.isWeb) {
         await databaseFactoryWeb.deleteDatabase(db.path);
@@ -480,7 +479,7 @@ class SembastDatabase extends sync_db.Database {
       _database.remove(tableName);
       Sync.shared.logger?.i('Cleared table $tableName');
       // reopen
-      await _getDatabse(tableName);
+      await _getDatabase(tableName);
     }
   }
 
@@ -495,8 +494,8 @@ class SembastDatabase extends sync_db.Database {
   @override
   Future<void> deleteLocal(String modelName, String? id) async {
     final store = sembast.StoreRef.main();
-    if (await store.record(id).exists((await _getDatabse(modelName))!)) {
-      await store.record(id).delete((await _getDatabse(modelName))!);
+    if (await store.record(id).exists((await _getDatabase(modelName))!)) {
+      await store.record(id).delete((await _getDatabase(modelName))!);
     }
   }
 

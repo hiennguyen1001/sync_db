@@ -164,7 +164,7 @@ abstract class Service {
   /// Compare and save record coming from services
   Future<void> saveLocalRecords(ServicePoint service, List records) async {
     if (records.isEmpty) return;
-    final database = Sync.shared.local!;
+    final database = Sync.shared.local;
     //var lastTimestamp = DateTime.utc(0);
 
     await database.runInTransaction(service.name, (transaction) async {
@@ -192,7 +192,7 @@ abstract class Service {
   /// On response check to see if there has been a local change in that time
   /// if there has, do not update record to synced
   Future<void> updateRecordStatus(ServicePoint service, Map serverRecord) async {
-    final database = Sync.shared.local!;
+    final database = Sync.shared.local;
 
     await database.runInTransaction(service.name, (transaction) async {
       final localRecord =

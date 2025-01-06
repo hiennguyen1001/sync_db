@@ -103,7 +103,7 @@ class Storage {
             await FileUtils.moveFile(transfer.localPath!, finalPath);
           }
         }
-        await transfer.database!.deleteLocal(transfer.tableName, transfer.id);
+        await transfer.database.deleteLocal(transfer.tableName, transfer.id);
         _transferrings.remove(transfer.localPath);
         _retryDelayedMap.remove(transfer.id);
       } catch (e, stackTrace) {
@@ -268,7 +268,7 @@ class TransferMap extends Model {
   }
 
   static Future<List<TransferMap>> all() async {
-    var all = await TransferMap().database!.all('TransferMap', () {
+    var all = await TransferMap().database.all('TransferMap', () {
       return TransferMap();
     });
 
@@ -276,7 +276,7 @@ class TransferMap extends Model {
   }
 
   static Future<TransferMap> find(String id) async =>
-      await TransferMap().database!.find('TransferMap', id, TransferMap());
+      await TransferMap().database.find('TransferMap', id, TransferMap());
 
   static Query where(dynamic condition) {
     return Query('TransferMap').where(condition, TransferMap().database, () {

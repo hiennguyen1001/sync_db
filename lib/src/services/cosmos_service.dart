@@ -73,12 +73,14 @@ class CosmosService extends Service {
     var query = Query(servicePoint.name)
         .where('_status = ${SyncStatus.created.name}')
         .order('createdAt asc');
-    var createdRecords = await Sync.shared.local!.queryMap(query);
+    var createdRecords = await Sync.shared.local.queryMap(query);
 
     for (final record in createdRecords) {
       // If record has a partion and it doesn't match service point partition, then skip
       if (record['partition'] != null &&
-          servicePoint.partition != record['partition']) continue;
+          servicePoint.partition != record['partition']) {
+        continue;
+      }
 
       // if a record does not have partition, then use it from service point
       if (record['partition'] == null) {
@@ -98,12 +100,14 @@ class CosmosService extends Service {
     query = Query(servicePoint.name)
         .where('_status = ${SyncStatus.updated.name}')
         .order('updatedAt asc');
-    var updatedRecords = await Sync.shared.local!.queryMap(query);
+    var updatedRecords = await Sync.shared.local.queryMap(query);
 
     for (final record in updatedRecords) {
       // If record has a partion and it doesn't match service point partition, then skip
       if (record['partition'] != null &&
-          servicePoint.partition != record['partition']) continue;
+          servicePoint.partition != record['partition']) {
+        continue;
+      }
 
       // if a record does not have partition, then use it from service point
       if (record['partition'] == null) {

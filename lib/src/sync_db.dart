@@ -9,7 +9,7 @@ class Sync {
   Sync._privateConstructor();
   static Sync shared = Sync();
 
-  Database? local;
+  late Database local;
   Service? service;
   UserSession? userSession;
   Logger? logger;

@@ -172,7 +172,7 @@ class CognitoAzureUserSession extends UserSession
           tableName = tableName.split('-shared')[0];
         }
 
-        await Sync.shared.local!.initTable(tableName);
+        await Sync.shared.local.initTable(tableName);
 
         final servicePoint = mappedServicePoints.putIfAbsent(
             tableName, () => ServicePoint(name: tableName));
@@ -247,7 +247,7 @@ class CognitoAzureUserSession extends UserSession
         await servicePoint.database
             .deleteLocal(servicePoint.tableName, servicePoint.id);
       }
-      await Sync.shared.local!.clearTable(table);
+      await Sync.shared.local.clearTable(table);
     }
 
     _refreshed = refresh();
