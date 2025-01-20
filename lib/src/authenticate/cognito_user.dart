@@ -140,6 +140,7 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
     }
     _userRole = null;
     _userInfo = null;
+    _session = null;
     for (final table in _tablesToClearOnSignOut) {
       final servicePoints = await ServicePoint.where('name = $table').load();
       for (final servicePoint in servicePoints) {
