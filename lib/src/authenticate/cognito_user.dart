@@ -296,6 +296,9 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
 
   @override
   Future<void> sendNewConfirm(String email) async {
+    if (_cognitoUser == null || _userInfo?.email != email.toLowerCase()) {
+      _cognitoUser = CognitoUser(email, _userPool, storage: _userPool.storage);
+    }
     _cognitoUser?.resendConfirmationCode();
   }
 
@@ -320,6 +323,12 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
       _cognitoUser = CognitoUser(email, _userPool, storage: _userPool.storage);
     }
     return _cognitoUser!.confirmPassword(confirmationCode, newPassword);
+  }
+
+  @override
+  Future<bool> confirmRegistration(String email, String confirmationCode) {
+    _cognitoUser = CognitoUser(email, _userPool, storage: _userPool.storage);
+    return _cognitoUser!.confirmRegistration(confirmationCode);
   }
 
   @override

@@ -439,6 +439,11 @@ class CognitoAzureUserSession extends UserSession
   }
 
   @override
+  Future<bool> confirmRegistration(String email, String confirmationCode) {
+    throw UnimplementedError();
+  }
+
+  @override
   Future forgotPassword(String email) {
     throw UnimplementedError();
   }
