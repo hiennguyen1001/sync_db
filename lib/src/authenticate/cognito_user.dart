@@ -448,8 +448,8 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
     try {
       _session = await _cognitoUser!.initiateAuth(authDetails);
     } on CognitoUserCustomChallengeException catch (e) {
-      // custom challenage
-      print('custom challenage $e');
+      // custom challenge
+      print('custom challenge $e');
     } on CognitoClientException {
       rethrow;
     } on Exception {
@@ -459,8 +459,8 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
   }
 
   @override
-  Future<void> deleteUser(String email) {
-    throw UnimplementedError();
+  Future<void> deleteUser(String email) async {
+    await _cognitoUser?.deleteUser();
   }
 }
 
