@@ -174,7 +174,7 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
   set refreshToken(String? token) => throw UnimplementedError();
 
   Future<List<MapEntry>?> resourceTokens() async {
-    if (!_session!.isValid()) {
+    if (_session == null || !_session!.isValid()) {
       _session = await _cognitoUser!.getSession();
     }
 
@@ -339,7 +339,7 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
     }
     _session = await _cognitoUser!.sendCustomChallengeAnswer(passcode);
 
-    if (!_session!.isValid()) {
+    if (_session == null || !_session!.isValid()) {
       return null;
     }
 
