@@ -61,7 +61,7 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
   }
 
   Future<void> _invalidateToken() async {
-    _cognitoUser!.getSignInUserSession()?.invalidateToken();
+    _cognitoUser?.getSignInUserSession()?.invalidateToken();
     final clockDriftKey = '${_cognitoUser!.keyPrefix}.clockDrift';
     final clockDrift =
         int.tryParse(await _cognitoUser!.storage.getItem(clockDriftKey) ?? '0') ?? 0;
@@ -71,7 +71,7 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
 
   String? _getUserRoleInToken() {
     var idToken = _session?.getIdToken().getJwtToken();
-    if (idToken == null) return null;
+    if (idToken == null || idToken.isEmpty) return null;
 
     final parts = idToken.split('.');
     final payload = parts[1];
@@ -93,11 +93,10 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
   @override
   Future<List<ServicePoint>> servicePoints() async {
     await _service.setup();
-    var schema = (await _service.schema)!;
+    var schema = await _service.schema;
     var results = <ServicePoint>[];
     for (var tableName in schema.keys) {
-      var servicePoint = await ServicePoint.searchBy(tableName) ??
-          ServicePoint(name: tableName);
+      var servicePoint = await ServicePoint.searchBy(tableName) ?? ServicePoint(name: tableName);
       var access = _createAccess(tableName, role);
       if (access != null) {
         servicePoint.access = access;
@@ -117,8 +116,7 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
   Future<List<ServicePoint>> servicePointsForTable(String table) async {
     await _service.setup();
     // Each table has only one service point
-    var servicePoint =
-        await ServicePoint.searchBy(table) ?? ServicePoint(name: table);
+    var servicePoint = await ServicePoint.searchBy(table) ?? ServicePoint(name: table);
     var access = _createAccess(table, role);
     if (access != null) {
       servicePoint.access = access;
@@ -174,7 +172,7 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
   set refreshToken(String? token) => throw UnimplementedError();
 
   Future<List<MapEntry>?> resourceTokens() async {
-    if (!_session!.isValid()) {
+    if (_session == null || !_session!.isValid()) {
       _session = await _cognitoUser!.getSession();
     }
 
@@ -201,7 +199,7 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
       return false;
     }
     _session = await _cognitoUser!.getSession();
-    return _session!.isValid();
+    return _session?.isValid() == true;
   }
 
   Future<void> authenticateUserSession(String email, String accessToken,
@@ -226,7 +224,7 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
     if (!isValid) {
       // try to get new session in case it's expired
       _session = await _cognitoUser!.getSession();
-      return _session!.isValid();
+      return _session?.isValid() == true;
     }
     return true;
   }
@@ -339,7 +337,7 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
     }
     _session = await _cognitoUser!.sendCustomChallengeAnswer(passcode);
 
-    if (!_session!.isValid()) {
+    if (_session == null || !_session!.isValid()) {
       return null;
     }
 
@@ -396,7 +394,7 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
     try {
       result = await _signUp(email, password, email);
       signUpSuccess?.call();
-      if (result.confirmed!) {
+      if (result.confirmed == true) {
         await login(email, password);
       }
       isNewUser = true;
@@ -430,11 +428,9 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
     final userAttributes = [
       AttributeArg(name: 'name', value: name),
     ];
-    data =
-        await _userPool.signUp(email, password, userAttributes: userAttributes);
+    data = await _userPool.signUp(email, password, userAttributes: userAttributes);
     isNewUser = true;
-    return CognitoUserInfo(
-        email: email, name: name, confirmed: data.userConfirmed);
+    return CognitoUserInfo(email: email, name: name, confirmed: data.userConfirmed);
   }
 
   /// Login user with custom authentication flow
@@ -449,7 +445,7 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
       _session = await _cognitoUser!.initiateAuth(authDetails);
     } on CognitoUserCustomChallengeException catch (e) {
       // custom challenge
-      print('custom challenge $e');
+      Sync.shared.logger?.i('custom challenge $e');
     } on CognitoClientException {
       rethrow;
     } on Exception {

@@ -277,9 +277,9 @@ class GraphQLService extends Service {
   }
 
   /// Get defined schema table
-  Future<Map?> get schema async {
+  Future<Map> get schema async {
     if (_schema != null) {
-      return _schema;
+      return _schema!;
     }
 
     var query = '''
@@ -306,7 +306,7 @@ class GraphQLService extends Service {
       throw SyncDataException('Can not get schema');
     }
 
-    return _schema;
+    return _schema!;
   }
 
   /// Get defined role permissions
