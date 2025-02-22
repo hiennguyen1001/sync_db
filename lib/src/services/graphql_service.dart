@@ -269,7 +269,7 @@ class GraphQLService extends Service {
       _graphClient = GraphQLClient(
         cache: GraphQLCache(),
         link: link,
-        queryRequestTimeout: Duration(seconds: 20)
+        queryRequestTimeout: Duration(seconds: 15)
       );
     }
 
