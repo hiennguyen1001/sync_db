@@ -117,12 +117,13 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
   @override
   Future<List<ServicePoint>> servicePointsForTable(String table) async {
     await _service.setup();
+    var schema = await _service.schema;
     // Each table has only one service point
     var servicePoint = await ServicePoint.searchBy(table) ?? ServicePoint(name: table);
     var access = _createAccess(table, role);
     if (access != null) {
-      servicePoint.access = access;
-      if (servicePoint.access != access) {
+      final String partition = schema[table]['partition'] ?? 'default';
+      if (servicePoint.access != access || servicePoint.partition != partition) {
         await servicePoint.save(syncToService: false);
       }
 
