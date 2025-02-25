@@ -99,8 +99,10 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
       var servicePoint = await ServicePoint.searchBy(tableName) ?? ServicePoint(name: tableName);
       var access = _createAccess(tableName, role);
       if (access != null) {
-        servicePoint.access = access;
-        if (servicePoint.access != access) {
+        final String partition = schema[tableName]['partition'];
+        if (servicePoint.access != access || servicePoint.partition != partition) {
+          servicePoint.access = access;
+          servicePoint.partition = partition;
           await servicePoint.save(syncToService: false);
         }
 
