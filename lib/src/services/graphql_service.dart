@@ -189,7 +189,7 @@ class GraphQLService extends Service {
       return result.data!['create${table}'];
     } else {
       Sync.shared.logger?.e('createDocument error [$query] [$variables] error',
-          error: result.exception, stackTrace: StackTrace.current);
+          error: result.exception?.linkException ?? result.exception, stackTrace: StackTrace.current);
       return callUpdateOnError ? (await _updateDocument(table, fields, record, callCreateOnError: false)) : null;
     }
   }
@@ -220,7 +220,7 @@ class GraphQLService extends Service {
       return result.data!['update${table}'];
     } else {
       Sync.shared.logger?.e('updateDocument error [$query] [$variables] error',
-          error: result.exception, stackTrace: StackTrace.current);
+          error: result.exception!.linkException ?? result.exception, stackTrace: StackTrace.current);
       return callCreateOnError ? (await _createDocument(table, fields, record, callUpdateOnError: false)) : null;
     }
   }
@@ -240,7 +240,7 @@ class GraphQLService extends Service {
         return result.data;
       } else {
         Sync.shared.logger
-            ?.e('queryDocuments [$query] [$variables] error', error: result.exception, stackTrace: StackTrace.current);
+            ?.e('queryDocuments [$query] [$variables] error', error: result.exception!.linkException ?? result.exception, stackTrace: StackTrace.current);
       }
     }
 
