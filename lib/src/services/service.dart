@@ -217,4 +217,14 @@ abstract class Service {
   void excludePrivateFields(Map map) {
     map.removeWhere((key, value) => key.startsWith('_'));
   }
+
+  Future<void> resetSyncTime(List<String> tables) async {
+    for (var table in tables) {
+      final servicePoint = (await Sync.shared.userSession?.servicePointsForTable(table))?.firstOrNull;
+      if (servicePoint != null) {
+        servicePoint.from = 0;
+        await servicePoint.save(syncToService: false);
+      }
+    }
+  }
 }
