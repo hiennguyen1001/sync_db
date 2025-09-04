@@ -463,6 +463,16 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
   Future<void> deleteUser(String email) async {
     await _cognitoUser?.deleteUser();
   }
+
+  @override
+  Future<void> setUserProperty(String field, String value) async {
+    if (!await hasSignedIn()) {
+      return;
+    }
+
+    final attributes = [CognitoUserAttribute(name: field, value: value)];
+    await _cognitoUser?.updateAttributes(attributes);
+  }
 }
 
 class CognitoUserInfo {
