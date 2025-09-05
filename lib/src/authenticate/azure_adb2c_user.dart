@@ -335,7 +335,7 @@ class AzureADB2CUserSession extends UserSession {
       (await _sharePrefInstance)!.getString(_refreshTokenKey);
 
   @override
-  Future<void> setUserProperty(String field, String value) {
+  Future<bool> setUserProperty(String field, String value) {
     throw UnimplementedError();
   }
 }

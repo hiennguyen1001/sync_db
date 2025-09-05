@@ -466,7 +466,7 @@ class CognitoAzureUserSession extends UserSession
   }
 
   @override
-  Future<void> setUserProperty(String field, String value) {
+  Future<bool> setUserProperty(String field, String value) {
     throw UnimplementedError();
   }
 }

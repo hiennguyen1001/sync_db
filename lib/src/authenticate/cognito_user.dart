@@ -465,13 +465,13 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
   }
 
   @override
-  Future<void> setUserProperty(String field, String value) async {
+  Future<bool> setUserProperty(String field, String value) async {
     if (!await hasSignedIn()) {
-      return;
+      return false;
     }
 
     final attributes = [CognitoUserAttribute(name: field, value: value)];
-    await _cognitoUser?.updateAttributes(attributes);
+    return await _cognitoUser?.updateAttributes(attributes) == true;
   }
 }
 

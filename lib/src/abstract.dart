@@ -41,7 +41,7 @@ abstract class UserSession {
   /// delete user
   Future<void> deleteUser(String email);
 
-  Future<void> setUserProperty(String field, String value);
+  Future<bool> setUserProperty(String field, String value);
 }
 
 abstract class Database {
