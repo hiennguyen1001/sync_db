@@ -61,12 +61,14 @@ class CognitoUserSession implements UserSession, CognitoAuthSession {
   }
 
   Future<void> _invalidateToken() async {
-    _cognitoUser?.getSignInUserSession()?.invalidateToken();
-    final clockDriftKey = '${_cognitoUser!.keyPrefix}.clockDrift';
-    final clockDrift =
-        int.tryParse(await _cognitoUser!.storage.getItem(clockDriftKey) ?? '0') ?? 0;
-    await _cognitoUser!.storage
-        .setItem(clockDriftKey, '${clockDrift - Duration.secondsPerHour * 2}');
+    if (_cognitoUser != null) {
+      _cognitoUser!.getSignInUserSession()?.invalidateToken();
+      final clockDriftKey = '${_cognitoUser!.keyPrefix}.clockDrift';
+      final clockDrift =
+          int.tryParse(await _cognitoUser!.storage.getItem(clockDriftKey) ?? '0') ?? 0;
+      await _cognitoUser!.storage
+          .setItem(clockDriftKey, '${clockDrift - Duration.secondsPerHour * 2}');
+    }
   }
 
   String? _getUserRoleInToken() {
